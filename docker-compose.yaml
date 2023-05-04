@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  sensor:
+    image: sensor
+    build:
+      context: ./sensor-simulator
+    deploy:
+      mode: replicated
+      replicas: 2
+
+  calculator:
+    image: calculator
+    build:
+      context: ./calculator
+    container_name: calculator
+
+  alarm:
+    image: alarm
+    build:
+      context: ./alarm
+    container_name: alarm
+    
