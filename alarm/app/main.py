@@ -1,11 +1,17 @@
+import threading
 import logging
+import time
+import os
 
+from flask import Flask, render_template
 import paho.mqtt.client as mqtt
 
 from config import MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, LOGGING_CONFIG
 
 
+app = Flask(__name__, template_folder=os.path.abspath('templates'))
 topic = 'calculator'
+messages = []
 
 
 def on_connect(client, userdata, flags, rc):
@@ -27,15 +33,26 @@ def on_message(client, userdata, message):
     logging.debug(f"SUBSCRIPTION -- * Message received in topic {message.topic}, payload: {payload}.*")
 
     if(payload == "high_temperature"):
-        print("The temperature of the environment is high.")
+        create_alarm("The temperature of the environment is high.")
+        # app.config['message'] = "The temperature of the environment is high."
     
     if(payload == "sudden_temperature_increase"):
-        print("The temperature of the environment has changed suddenly.")
+        create_alarm("The temperature of the environment has changed suddenly.")
+        # app.config['message'] = "The temperature of the environment has changed suddenly."
 
 
-if __name__ == "__main__":
-    logging.basicConfig(level=int(LOGGING_CONFIG))
+def create_alarm(message):
+    global messages
 
+    current_time = time.asctime(time.localtime(time.time()))
+
+    messages.append((current_time, message))
+
+    if len(messages) > 5:
+        messages.pop(0)
+
+
+def start_mqtt_client():
     mqtt_client = mqtt.Client()
 
     mqtt_client.on_connect = on_connect
@@ -46,3 +63,25 @@ if __name__ == "__main__":
     mqtt_client.subscribe(topic)
 
     mqtt_client.loop_forever()
+
+
+@app.route('/')
+def index():
+    mqtt_thread = threading.Thread(target=start_mqtt_client)
+    mqtt_thread.start()
+
+    return 'MQTT client started.'
+
+
+@app.route('/alarms')
+def output():
+    global messages
+
+    return render_template('index.html', messages=messages)
+    # return app.config.get('message', 'No alarm detected.')
+
+
+if __name__ == '__main__':
+    logging.basicConfig(level=int(LOGGING_CONFIG))
+
+    app.run(host='0.0.0.0', port=8080)
