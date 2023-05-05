@@ -3,15 +3,14 @@ import logging
 import time
 import os
 
-from flask import Flask, render_template
+from flask import Flask, render_template, redirect, url_for
 import paho.mqtt.client as mqtt
 
 from config import MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, LOGGING_CONFIG
 
-
 app = Flask(__name__, template_folder=os.path.abspath('templates'))
 topic = 'calculator'
-messages = []
+messages = list()
 
 
 def on_connect(client, userdata, flags, rc):
@@ -34,11 +33,9 @@ def on_message(client, userdata, message):
 
     if(payload == "high_temperature"):
         create_alarm("The temperature of the environment is high.")
-        # app.config['message'] = "The temperature of the environment is high."
     
     if(payload == "sudden_temperature_increase"):
         create_alarm("The temperature of the environment has changed suddenly.")
-        # app.config['message'] = "The temperature of the environment has changed suddenly."
 
 
 def create_alarm(message):
@@ -59,7 +56,7 @@ def start_mqtt_client():
     mqtt_client.on_subscribe = on_subscribe
     mqtt_client.on_message = on_message
 
-    mqtt_client.connect(MQTT_HOST, port=MQTT_PORT, keepalive=int(MQTT_KEEPALIVE))
+    mqtt_client.connect(MQTT_HOST, port=int(MQTT_PORT), keepalive=int(MQTT_KEEPALIVE))
     mqtt_client.subscribe(topic)
 
     mqtt_client.loop_forever()
@@ -69,16 +66,15 @@ def start_mqtt_client():
 def index():
     mqtt_thread = threading.Thread(target=start_mqtt_client)
     mqtt_thread.start()
-
-    return 'MQTT client started.'
+    
+    return redirect(url_for('alarms'))
 
 
 @app.route('/alarms')
-def output():
+def alarms():
     global messages
 
     return render_template('index.html', messages=messages)
-    # return app.config.get('message', 'No alarm detected.')
 
 
 if __name__ == '__main__':

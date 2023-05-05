@@ -101,7 +101,7 @@ if __name__ == "__main__":
     mqtt_client.on_subscribe = on_subscribe
     mqtt_client.on_message = on_message
 
-    mqtt_client.connect(MQTT_HOST, port=MQTT_PORT, keepalive=int(MQTT_KEEPALIVE))
+    mqtt_client.connect(MQTT_HOST, port=int(MQTT_PORT), keepalive=int(MQTT_KEEPALIVE))
     mqtt_client.subscribe(sensor_topic)
 
     mqtt_client.loop_start()

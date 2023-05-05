@@ -10,4 +10,6 @@ COPY . .
 
 EXPOSE 8080
 
-CMD ["python", "app/main.py"]
+WORKDIR /project/app
+
+CMD ["python", "main.py"]

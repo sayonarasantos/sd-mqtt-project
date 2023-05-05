@@ -50,7 +50,7 @@ if __name__ == "__main__":
     mqtt_client.on_connect = on_connect
     mqtt_client.on_disconnect = on_disconnect
 
-    mqtt_client.connect(MQTT_HOST, port=MQTT_PORT, keepalive=int(MQTT_KEEPALIVE))
+    mqtt_client.connect(MQTT_HOST, port=int(MQTT_PORT), keepalive=int(MQTT_KEEPALIVE))
     
     measured_values = generate_measured_values(float(MEASURED_VALUE_MIN), float(MEASURED_VALUE_MAX), int(MEASURED_VALUES_LIST_SIZE))
     
