@@ -3,7 +3,7 @@ import logging
 
 import paho.mqtt.client as mqtt
 
-from config import MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, SENSOR_TYPE, MEAN_PERIOD, CALCULATION_TIME_INTERVAL, LOGGING_CONFIG
+from config import MQTT_HOST, MQTT_PORT, MQTT_KEEPALIVE, SENSOR_TYPE, MEAN_PERIOD, LOGGING_CONFIG
 
 
 measured_values_times = list()
@@ -70,6 +70,8 @@ def calcule_mean():
 def check_mean(value, mqtt_client):
     global last_mean_value
 
+    logging.debug(f"CALCULATION -- * Last mean: {last_mean_value}.*")
+
     if value > 200:
         publish_message(mqtt_client, "high_temperature")
 
@@ -79,6 +81,8 @@ def check_mean(value, mqtt_client):
 
         if (delta > 5):
             publish_message(mqtt_client, "sudden_temperature_increase")
+    
+    last_mean_value = value
 
 
 def publish_message(mqtt_client, message):
@@ -108,4 +112,4 @@ if __name__ == "__main__":
 
     while True:
         check_mean(calcule_mean(), mqtt_client)
-        time.sleep(int(CALCULATION_TIME_INTERVAL))
+        time.sleep(int(MEAN_PERIOD))

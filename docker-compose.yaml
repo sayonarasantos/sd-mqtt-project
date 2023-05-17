@@ -12,6 +12,14 @@ services:
       replicas: 2
     environment:
       - LOGGING_CONFIG=10 #DEBUG
+      - MQTT_HOST=broker
+      - MEASURED_VALUES_LIST_SIZE=50
+      - MEASURED_VALUE_MIN=0
+      - MEASURED_VALUE_MAX=250
+      - MESSAGE_TIME_INTERVAL=5
+    depends_on:
+      broker:
+        condition: service_healthy
 
   calculator:
     image: calculator
@@ -19,7 +27,12 @@ services:
       context: ./calculator
     container_name: calculator
     environment:
-      - LOGGING_CONFIG=20 #INFO
+      - LOGGING_CONFIG=10 #DEBUG
+      - MQTT_HOST=broker
+      - MEAN_PERIOD=10
+    depends_on:
+      broker:
+        condition: service_healthy
 
   alarm:
     image: alarm
@@ -27,7 +40,23 @@ services:
       context: ./alarm
     container_name: alarm
     ports:
-      - 8001:8080
+      - 8080:8080
     environment:
       - LOGGING_CONFIG=20 #INFO
-    
+      - MQTT_HOST=broker
+    depends_on:
+      broker:
+        condition: service_healthy
+  
+  broker:
+    image: eclipse-mosquitto:2
+    container_name: broker
+    ports:
+      - 1883:1883
+    volumes:
+      - ./broker/mosquitto.conf:/mosquitto/config/mosquitto.conf
+    healthcheck:
+      test: mosquitto_pub -h localhost -p 1883 -t healthcheck -m "test"
+      interval: 10s
+      timeout: 5s
+      retries: 2

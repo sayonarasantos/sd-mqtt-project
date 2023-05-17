@@ -41,7 +41,7 @@ def on_message(client, userdata, message):
 def create_alarm(message):
     global messages
 
-    current_time = time.asctime(time.localtime(time.time()))
+    current_time = time.strftime("%Y-%m-%d %H:%M:%S")
 
     messages.append((current_time, message))
 
