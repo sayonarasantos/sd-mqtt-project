@@ -1,3 +1,4 @@
+# Nesse script é feita a configuração das variáveis utilizadas na aplicação
 import os
 
 

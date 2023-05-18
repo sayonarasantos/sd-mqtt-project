@@ -27,7 +27,7 @@ services:
       context: ./calculator
     container_name: calculator
     environment:
-      - LOGGING_CONFIG=10 #DEBUG
+      - LOGGING_CONFIG=20 #INFO
       - MQTT_HOST=broker
       - MEAN_PERIOD=10
     depends_on:
