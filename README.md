@@ -1,6 +1,6 @@
 # Projeto MQTT para a cadeira de Sistemas Distribuídos
 
-Foram desenvolvido três serviços que se comunicam por meio de um servidor MQTT:
+Foram desenvolvidos três serviços que se comunicam por meio de um servidor MQTT:
 
 - O simulador de sensores de temperatura
 - A calculadora de média da temperatura
@@ -16,14 +16,16 @@ Além disso, utiliza-se um servidor MQTT Mosquitto de forma self-hosted.
 
 ### Execução
 
-Iniciar as aplicações
+- Iniciar as aplicações
 
-```bash
-docker compose up -d
-```
+    ```bash
+    docker compose up -d
+    ```
 
-Parar as aplicações
+    O aplicação web de alarme fica disponível em [0.0.0.0:8080](0.0.0.0:8080).
 
-```bash
-docker compose down
-```
+- Parar as aplicações
+
+    ```bash
+    docker compose down
+    ```
